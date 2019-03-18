@@ -7,10 +7,10 @@ public class VirtualPageTableEntries {
 	
 	//pls check the default bits
 	public VirtualPageTableEntries() {
-		Vbit = true;
-		Rbit = true;
+		Vbit = false;
+		Rbit = false;
 		Dbit = false;
-		pageFrameNum = 0;
+		pageFrameNum = -1;
 	}
 	
 	public VirtualPageTableEntries(boolean V, boolean R, boolean D, int pfNum) {
@@ -21,12 +21,19 @@ public class VirtualPageTableEntries {
 	}
 	
 	//pretty much getter for V, R, and D
-	public int getBit(boolean bit) {
-		if(bit == true) {
-			return 1;
-		} else {
-			return 0;
-		}
+	public bool isValid() {
+		return Vbit;
+	}
+
+	public bool isReferenced() {
+		return Rbit;
+
+	}public bool isDirty() {
+		return Dbit;
+	}
+
+	public int getPageFrameNum() {
+		return pageFrameNum;
 	}
 	
 	public void setVbit(boolean Vbit) {
