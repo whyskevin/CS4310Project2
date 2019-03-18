@@ -90,12 +90,13 @@ public class MMU {
 	// 	}
 	// 	return TLB;
 	// }
-	public void replaceTLBEntry(TlbEntries replacementEntry) {
-		if (TLB[pageReplacementCounter].isDirty()){
+	//adds new tableEntry
+	public void addTLBEntry(TlbEntries entry) {
+		if (TLB[TLBPageReplacementCounter].isDirty()){
 			//TODO: write to disk
 		}
 
-		TLB[pageReplacementCounter] = replacementEntry;
+		TLB[TLBPageReplacementCounter] = entry;
 		TLBPageReplacementCounter = (TLBPageReplacementCounter + 1) % SIZE_OF_TLB;
 	}
 }
