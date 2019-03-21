@@ -1,9 +1,11 @@
 import java.io.*;
 import java.util.*;
+import java.lang.Math;
 
 public class CPU {
 	public final File test_data = new File("/Project2_test_and_page_files.test_files");
 	public static File [] listOfFiles = null;
+	public MMU mmu = new MMU();
 	
 	public void readProcesses() throws FileNotFoundException{
 		listOfFiles = test_data.listFiles();
@@ -24,5 +26,22 @@ public class CPU {
 			}
 		}
 	}
-	
+	public int convertHexToDecimal(String hex) {
+		int decimal = 0;		
+
+		for (int i = 0; i < hex.size(); ++i) {
+			char hexChar = hex[hex.size()-1-i];
+			int offset = '0';
+			if (hexChar >= 'A' && hexChar <= 'F')
+				offset = 'A';
+			
+			decimal += Math.pow(16,i) * (hexChar - offset)
+		}
+
+		return decimal;
+	}
+
+	public void resetRbits() {
+		
+	}
 }

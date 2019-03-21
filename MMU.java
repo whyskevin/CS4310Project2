@@ -5,8 +5,13 @@ public class MMU {
 	private VirtualPageTableEntries[] pageTable;
 	private int[][] physicalMem;
 	private int TLBPageReplacementCounter = 0;	//is "pageToReplaceInTLB" a counter? It keeps a reference to which page to be replaced.
-	private static int SIZE_OF_TLB = 16;
 	
+	public MMU(int tlbSize, int numVirtualPages, int numPhysicalPages, int pageSize) {
+		TLB = new TlbEntries[tlbSize];
+		pageTable = new VirtualPageTableEntries[numVirtualPages];
+		physicalMem = new int[numPhysicalPages][pageSize];
+	}
+
 	public MMU(TlbEntries[] TLB, VirtualPageTableEntries[] pageTable, 
 			int[][] physicalMem) {
 		this.TLB = TLB;
@@ -92,11 +97,8 @@ public class MMU {
 
 	//adds new tableEntry
 	public void addTLBEntry(TlbEntries entry) {
-		if (TLB[TLBPageReplacementCounter].isDirty()){
-			//TODO: write to disk
-		}
 		TLB[TLBPageReplacementCounter] = entry;
-		TLBPageReplacementCounter = (TLBPageReplacementCounter + 1) % SIZE_OF_TLB;
+		TLBPageReplacementCounter = (TLBPageReplacementCounter + 1) % TLB.length;
 	}
 	
 	public void processInstruction(int virtualPageIndex, int physicalOffset , boolean read, int data) {
