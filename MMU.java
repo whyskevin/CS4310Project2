@@ -106,13 +106,19 @@ public class MMU {
 				
 			}else {	//The entry doesn't exist in the TLB
 				int checkResult = checkVirtualPageTable(virtualPageIndex);	//Now check the page table
-				if(checkResult >= 0) {
+				if(checkResult >= 0) {	//Soft miss
 					//Get the entry from the page table
 					//Now replace the oldest entry in the TLB with the entry
 					VirtualPageTableEntries retrievedEntry = pageTable[checkResult];
-					retrievedEntry.setVbit(true);
-					retrievedEntry.setRbit(true);
-					replaceTLBEntry((TlbEntries)retrievedEntry);
+					
+					TlbEntries replacementEntry = new TlbEntries(virtualPageIndex,
+														true,
+														true,
+														retrievedEntry.isDirty(),
+														retrievedEntry.getPageFrameNum());
+//					retrievedEntry.setVbit(true);	Is the physical entry also referenced and valid?	
+//					retrievedEntry.setRbit(true);
+					addTLBEntry(replacementEntry);
 				}else{	//Hard miss
 					
 				}
@@ -120,7 +126,27 @@ public class MMU {
 		}else {	//Writing
 			VirtualPageTableEntries newEntry = new VirtualPageTableEntries();
 			
+			
 		}
 	}
+	
+	
+	/*
+	 * 1.Checks if it's present in the TLB
+	 * 2.If it is present
+	 * 		Read: R bit to true
+	 * 		Write: Access (Pg frame number, offset)	in the RAM. Overwrite the value there to the given data
+	 * 3.Else if it isn't present check virtualPageTable
+	 * 		Soft Miss: if its present in virtualpagetable
+	 * 			Retrieves the entry from the pageTable.
+	 * 			Add to the TLB and change V and R bit to true
+	 * 				Read: does nothing
+	 * 				Write: Access (Pg frame number, offset)	in the RAM. Overwrite the value there to the given data
+	 * 		Hard Miss:
+	 *			Use the clock replacement algorithm to decide which entry in Pg. table to evict
+	 *			Creates a new VirtualPage Entry 
+	 * 			
+	 * 
+	 * */
 	
 }
