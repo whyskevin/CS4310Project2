@@ -4,7 +4,7 @@ public class MMU {
 	private TlbEntries[] TLB;
 	private VirtualPageTableEntries[] pageTable;
 	private int[][] physicalMem;
-	private int TLBPageReplacementCounter = 0;	//is "pageToReplaceInTLB" a counter?
+	private int TLBPageReplacementCounter = 0;	//is "pageToReplaceInTLB" a counter? It keeps a reference to which page to be replaced.
 	private static int SIZE_OF_TLB = 16;
 	
 	public MMU(TlbEntries[] TLB, VirtualPageTableEntries[] pageTable, 
@@ -27,10 +27,9 @@ public class MMU {
 	//if false, returns -1
 	public int checkTLB(int virtualPageIndex) {
 		for (int i = 0; i < TLB.length; ++i) {
-			if (TLB[i].getVirtualPageNum == virtualPageIndex && TLB[i].isValid())
+			if (TLB[i].getVirtualPageNum() == virtualPageIndex && TLB[i].isValid())
 				return i;
 		}
-
 		return -1;
 	}
 
@@ -40,7 +39,7 @@ public class MMU {
 	//if false, throw error for hard miss
 	public int checkVirtualPageTable(int virtualPageIndex) {
 		if (pageTable[virtualPageIndex].isValid())
-			return pageTable[virtualPageIndex].getPageFrameNumber;
+			return pageTable[virtualPageIndex].getPageFrameNum();
 		else
 			//TODO: throw error and OS loads page into physical memory
 			return -1;
@@ -91,11 +90,36 @@ public class MMU {
 	// 	return TLB;
 	// }
 	public void replaceTLBEntry(TlbEntries replacementEntry) {
-		if (TLB[pageReplacementCounter].isDirty()){
+		if (TLB[TLBPageReplacementCounter].isDirty()){
 			//TODO: write to disk
 		}
 
-		TLB[pageReplacementCounter] = replacementEntry;
+		TLB[TLBPageReplacementCounter] = replacementEntry;
 		TLBPageReplacementCounter = (TLBPageReplacementCounter + 1) % SIZE_OF_TLB;
 	}
+	
+	public void processInstruction(int virtualPageIndex, int physicalOffset , boolean read, int data) {
+		if(read) {	//Reading
+			int TLB_Flag = checkTLB(virtualPageIndex);
+			if(TLB_Flag >= 0) {	//The entry exists in the TLB
+				
+			}else {	//The entry doesn't exist in the TLB
+				int checkResult = checkVirtualPageTable(virtualPageIndex);	//Now check the page table
+				if(checkResult >= 0) {
+					//Get the entry from the page table
+					//Now replace the oldest entry in the TLB with the entry
+					VirtualPageTableEntries retrievedEntry = pageTable[checkResult];
+					retrievedEntry.setVbit(true);
+					retrievedEntry.setRbit(true);
+					replaceTLBEntry((TlbEntries)retrievedEntry);
+				}else{	//Hard miss
+					
+				}
+			}
+		}else {	//Writing
+			VirtualPageTableEntries newEntry = new VirtualPageTableEntries();
+			
+		}
+	}
+	
 }

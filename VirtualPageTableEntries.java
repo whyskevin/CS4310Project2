@@ -5,7 +5,6 @@ public class VirtualPageTableEntries {
 	private boolean Dbit;
 	private int pageFrameNum;
 	
-	//pls check the default bits
 	public VirtualPageTableEntries() {
 		Vbit = false;
 		Rbit = false;
@@ -13,6 +12,7 @@ public class VirtualPageTableEntries {
 		pageFrameNum = -1;
 	}
 	
+	//Loaded pages will be present and referenced (true).
 	public VirtualPageTableEntries(boolean V, boolean R, boolean D, int pfNum) {
 		Vbit = V;
 		Rbit = R;
@@ -20,15 +20,16 @@ public class VirtualPageTableEntries {
 		pageFrameNum = pfNum;
 	}
 	
-	//pretty much getter for V, R, and D
-	public bool isValid() {
+	//Getters
+	public boolean isValid() {
 		return Vbit;
 	}
 
-	public bool isReferenced() {
+	public boolean isReferenced() {
 		return Rbit;
-
-	}public bool isDirty() {
+	}
+	
+	public boolean isDirty() {
 		return Dbit;
 	}
 
@@ -36,6 +37,7 @@ public class VirtualPageTableEntries {
 		return pageFrameNum;
 	}
 	
+	//Setters
 	public void setVbit(boolean Vbit) {
 		this.Vbit = Vbit;
 	}
