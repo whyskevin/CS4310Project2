@@ -5,10 +5,14 @@ import java.lang.Math;
 public class CPU {
 	public final File test_data = new File("/Project2_test_and_page_files.test_files");
 	public static File [] listOfFiles = null;
-	public MMU mmu = new MMU();
+	public MMU mmu;
+
+	public CPU(int tlbSize, int numVirtualPages, int numPhysicalPages, int pageSize) {
+		listOfFiles = test_data.listFiles();
+		mmu = new MMU(tlbSize, numVirtualPages, numPhysicalPages, pageSize);
+	}
 	
 	public void readProcesses() throws FileNotFoundException{
-		listOfFiles = test_data.listFiles();
 		boolean read = false;
 		int data = 0;
 		
@@ -42,6 +46,10 @@ public class CPU {
 	}
 
 	public void resetRbits() {
-		
+		mmu.resetRbits();
+	}
+
+	public void unsetDbit(int virtualPageIndex) {
+		mmu.unsetDbit(virtualPageIndex);
 	}
 }
