@@ -20,11 +20,26 @@ public class CPU {
 		for(File file: listOfFiles) {
 			Scanner in = new Scanner(file);
 			while(in.hasNext()) {
-				String valueString = in.next();
 				for(int i = 0; i < 10; i++) {
-					if(Integer.valueOf(valueString) == 1) {	//Writing data
-						
-					}
+					if (!in.hasNext())
+						break;
+					int instruction = in.nextInt();
+
+					//grabbing virtual address and splitting
+					String virtualAddress = in.next();
+					String virtualPageStr = virtualAddress.substring(0,2);
+					String pageOffsetStr = virtualAddress.substring(2,2);
+
+					int virtualPage = convertHexToDecimal(virtualPageStr);
+					int pageOffset = convertHexToDecimal(pageOffsetStr);
+
+					boolean write = instruction == 1;
+
+					int data = 0;
+					if (write)
+						data = in.nextInt();
+
+					mmu.processInstruction(virtualPage, pageOffset, write, data);
 				}
 			
 			}
