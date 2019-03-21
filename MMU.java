@@ -102,53 +102,52 @@ public class MMU {
 	}
 	
 	public void processInstruction(int virtualPageIndex, int physicalOffset , boolean read, int data) {
-		if(read) {	//Reading
-			int TLB_Flag = checkTLB(virtualPageIndex);
-			if(TLB_Flag >= 0) {	//The entry exists in the TLB
-				
-			}else {	//The entry doesn't exist in the TLB
-				int checkResult = checkVirtualPageTable(virtualPageIndex);	//Now check the page table
-				if(checkResult >= 0) {	//Soft miss
-					//Get the entry from the page table
-					//Now replace the oldest entry in the TLB with the entry
-					VirtualPageTableEntries retrievedEntry = pageTable[checkResult];
-					
-					TlbEntries replacementEntry = new TlbEntries(virtualPageIndex,
-														true,
-														true,
-														retrievedEntry.isDirty(),
-														retrievedEntry.getPageFrameNum());
-//					retrievedEntry.setVbit(true);	Is the physical entry also referenced and valid?	
-//					retrievedEntry.setRbit(true);
-					addTLBEntry(replacementEntry);
-				}else{	//Hard miss
-					
-				}
+		int TLB_Flag = checkTLB(virtualPageIndex);
+		if(TLB_Flag >= 0) {	//The entry exists in the TLB
+			TlbEntries presentEntry = TLB[TLB_Flag];
+			if(read) {	//Reading
+				presentEntry.setRbit(true);
+			}else {	//Writing
+				physicalMem[presentEntry.getVirtualPageNum()][physicalOffset] = data;
+				presentEntry.setDbit(true);
 			}
-		}else {	//Writing
-			VirtualPageTableEntries newEntry = new VirtualPageTableEntries();
-			
-			
+		}else {	//The entry doesn't exist in the TLB
+			int checkResult = checkVirtualPageTable(virtualPageIndex);	//Now check the page table
+			if(checkResult >= 0) {	//Soft miss
+				//Get the entry from the page table
+				//Now replace the oldest entry in the TLB with the entry
+				VirtualPageTableEntries retrievedEntry = pageTable[checkResult];
+				retrievedEntry.setVbit(true);
+				retrievedEntry.setRbit(true);
+				TlbEntries replacementEntry = new TlbEntries(virtualPageIndex,
+						retrievedEntry.isValid(),
+						retrievedEntry.isReferenced(),
+						retrievedEntry.isDirty(),
+						retrievedEntry.getPageFrameNum());
+				addTLBEntry(replacementEntry);
+			}else{	//Hard miss
+				
+			}
 		}
 	}
-	
-	
-	/*
+
+
+	/*	processInstruction()
 	 * 1.Checks if it's present in the TLB
 	 * 2.If it is present
 	 * 		Read: R bit to true
 	 * 		Write: Access (Pg frame number, offset)	in the RAM. Overwrite the value there to the given data
 	 * 3.Else if it isn't present check virtualPageTable
-	 * 		Soft Miss: if its present in virtualpagetable
+	 * 		Soft Miss: if its present in virtualPageTable
 	 * 			Retrieves the entry from the pageTable.
 	 * 			Add to the TLB and change V and R bit to true
 	 * 				Read: does nothing
 	 * 				Write: Access (Pg frame number, offset)	in the RAM. Overwrite the value there to the given data
-	 * 		Hard Miss:
+	 * 		Hard Miss:	//Goes to OS to find replacement entry
 	 *			Use the clock replacement algorithm to decide which entry in Pg. table to evict
-	 *			Creates a new VirtualPage Entry 
-	 * 			
-	 * 
+	 *			Loads .pg file from /.page_files directory using the virtualPageIndex.
+	 *			Replaces the entry in the pageTable with the new entry at the evicted entry's location.
+	 * 			Page frame num is kept
 	 * */
 	
 }
