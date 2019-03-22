@@ -21,29 +21,27 @@ public class Driver {
     public static String pageFileDir = "Project2_test_and_page_files/page_files";
 
     
-    public static void diskLoad(MMU mmu, int virtualPageIndex, int physicalPageIndex, String pageFileDir) {
+    public static void diskLoad(MMU mmu, TlbEntries entry, String pageFileDir) {
         try {
         
-            File file = new File(pageFileDir + "/" + Integer.toString(virtualPageIndex, 16) + ".pg");
+            File file = new File(pageFileDir + "/" + Integer.toString(entry.getVirtualPageNum(), 16) + ".pg");
             Scanner sc = new Scanner(file);
             
-            for (int i = 0; i < mmu.getPhysicalMem()[physicalPageIndex].length; ++i)
-                mmu.getPhysicalMem()[physicalPageIndex][i] = sc.nextInt();
+            for (int i = 0; i < mmu.getPhysicalMem()[0].length; ++i)
+                mmu.getPhysicalMem()[entry.getPageFrameNum()][i] = sc.nextInt();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        
     }
     
-    public static void diskWrite(MMU mmu, int virtualPageIndex, int physicalPageIndex, String pageFileDir) {
+    public static void diskWrite(MMU mmu, TlbEntries entry, String pageFileDir) {
         try {
-            File file = new File(pageFileDir + "/" + Integer.toString(virtualPageIndex, 16) + ".pg");
+            File file = new File(pageFileDir + "/" + Integer.toString(entry.getVirtualPageNum(), 16) + ".pg");
             PrintWriter writer = new PrintWriter(file);
             
-            for (int i = 0; i < mmu.getPhysicalMem().length; ++i) {
-                for (int j = 0; j < mmu.getPhysicalMem()[i].length; ++j)
-                    writer.println(mmu.getPhysicalMem()[i][j]);
-            }
+            for (int i = 0; i < mmu.getPhysicalMem()[0].length; ++i)
+                    writer.println(mmu.getPhysicalMem()[entry.getPageFrameNum()][i]);
+                    
             writer.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -53,7 +51,9 @@ public class Driver {
     public static void main(String[] args) {
         int vp = 24;
         int pf = 1;
-        diskWrite(mmu, 24, 1, pageFileDir);
+        
+        TlbEntries entry = new TlbEntries(vp, false, false, false, pf);
+        diskWrite(mmu, entry, pageFileDir);
         
         for (int i = 0; i < mmu.getPhysicalMem().length; ++i) {
             for (int j = 0; j < mmu.getPhysicalMem()[i].length; ++j)
