@@ -24,12 +24,20 @@ public class OS {
 		return clock.getData();
 	}
 	
-	public static void clockEvict(TlbEntries replacementEntry) {
+	public static void clockEvict(TlbEntries replacementEntry) throws FileNotFoundException {
 		TlbEntries t = pageReplacement(replacementEntry);
 		if(t.isDirty()) {
 			//write to hard disk?
-			
+			diskWrite(t);
 		}
+	}
+	
+	public static void diskWrite(TlbEntries t) throws FileNotFoundException {
+		
+	}
+	
+	public static void diskLoad(TlbEntries t) throws FileNotFoundException {
+		
 	}
 	
 	public static void resetRbit(MMU mmu) {
