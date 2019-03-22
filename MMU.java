@@ -1,4 +1,4 @@
-
+import java.util.*;
 public class MMU {
 	
 	private TlbEntries[] TLB;
@@ -126,6 +126,8 @@ public class MMU {
 						retrievedEntry.getPageFrameNum());
 				addTLBEntry(replacementEntry);
 			}else{	//Hard miss
+				throw new MissingResourceException("Cannot find " + virtualPageIndex + " in the page table.", "VirtualPageEntries", String.valueOf(virtualPageIndex));
+				//Throws to CPU readInstruction()
 			}
 		}
 	}

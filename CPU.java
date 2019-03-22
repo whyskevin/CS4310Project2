@@ -39,17 +39,26 @@ public class CPU {
 					data = 0;
 					if (write)
 						data = in.nextInt();
-					Process readProcess = new Process(instruction,virtualPage,pageOffset,data);	//Saves the values into a Process
+//					Process readProcess = new Process(instruction,virtualPage,pageOffset,data);	//Saves the values into a Process
 //					System.out.println(readProcess);
-					test_processes[testFileIndex][processIndex] = readProcess;	//Store in an array
-					processIndex++;
+//					test_processes[testFileIndex][processIndex] = readProcess;	//Store in an array
+//					processIndex++;
 //					mmu.processInstruction(virtualPage, pageOffset, write, data);
 //				}
 			}
-			System.out.println(processIndex);
-			testFileIndex++;
-			processIndex = 0;
+//			System.out.println(processIndex);
+//			testFileIndex++;
+//			processIndex = 0;
 		}		
+	}
+	
+	public void readInstruction(int virtualPage, int pageOffset, boolean write, int data) {
+		try {
+			Driver.mmu.processInstruction(virtualPage, pageOffset, write, data);
+		} catch (Exception e) {
+			System.out.println(e.toString());
+			throw e;
+		}
 	}
 	
 	public void resetRbits() {

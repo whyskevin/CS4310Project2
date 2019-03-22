@@ -1,25 +1,25 @@
 public class Process {
-	private int readOrWrite;
+	private boolean write;
 	private int virtualPage;
 	private int pageOffset;
 	private int data;
 	
 	public Process() {
-		readOrWrite = 0;
+		write = false;
 		virtualPage = 0;
 		pageOffset = 0;
 		data = 0;
 	}
 	
-	public Process(int readWriteBit, int virtualPageIndex, int offset, int data) {
-		this.readOrWrite = readWriteBit;
+	public Process(boolean readWriteBit, int virtualPageIndex, int offset, int data) {
+		this.write = readWriteBit;
 		this.virtualPage = virtualPageIndex;
 		this.pageOffset = offset;
 		this.data = data;
 	}
 	
-	public int getReadWriteBit() {
-		return readOrWrite;
+	public boolean getReadWriteBit() {
+		return write;
 	}
 	
 	public int getVirtualPageNum() {
@@ -35,7 +35,7 @@ public class Process {
 	}
 	
 	public String toString() {
-		return "Read: " + readOrWrite + " VirtualPgIndex: " + virtualPage + " Offset: " + pageOffset + " Data: "+ data;
+		return "Read: " + write + " VirtualPgIndex: " + virtualPage + " Offset: " + pageOffset + " Data: "+ data;
 		
 	}
 

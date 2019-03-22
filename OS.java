@@ -2,9 +2,8 @@
 public class OS {
 	
 	private static CircularlyLinkedList<TlbEntries> clock = new CircularlyLinkedList();
-	MMU mmu = new MMU();
 	
-	public static CircularlyLinkedList<TlbEntries> loadClock(MMU mmu){
+	public static CircularlyLinkedList<TlbEntries> loadClock (MMU mmu) {
 		TlbEntries[] rtnTLB = mmu.getTLB();
 		for(TlbEntries i:rtnTLB) {
 			clock.add(i);
@@ -27,6 +26,14 @@ public class OS {
 		TlbEntries t = pageReplacement(replacementEntry);
 		if(t.isDirty()) {
 			//write to hard disk?
+			
+		}
+	}
+
+	public static void runProcess(CPU cpu, MMU mmu, Process p) {
+		try{
+			cpu.readInstruction(p.getVirtualPageNum(), p.getOffset(), p.getReadWriteBit(), p.getData());
+		}catch (Exception e){	//Hard miss
 			
 		}
 	}
