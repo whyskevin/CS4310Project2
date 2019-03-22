@@ -8,12 +8,11 @@ public class CPU {
 	public static Process[][] test_processes = new Process[4][1000];	//[test #index][Assume there are a max of 1000 processes in the test_data]
 	public MMU mmu;
 
-	public CPU(int tlbSize, int numVirtualPages, int numPhysicalPages, int pageSize) {
+	public CPU() {
 		listOfFiles = test_data.listFiles();
-		mmu = new MMU(tlbSize, numVirtualPages, numPhysicalPages, pageSize);
 	}
 	
-	public void readProcesses() throws FileNotFoundException{
+	public void readProcesses(MMU mmu) throws FileNotFoundException{
 		boolean read = false;
 		int data = 0;
 		int testFileIndex = 0;
@@ -33,9 +32,8 @@ public class CPU {
 					String virtualPageStr = virtualAddress.substring(0,2);
 					String pageOffsetStr = virtualAddress.substring(2,4);
 
-					int virtualPage = convertHexToDecimal(virtualPageStr);
-					int pageOffset = convertHexToDecimal(pageOffsetStr);
-
+					int virtualPage = Integer.parseInt(virtualAddress.substring(0,2), 16);
+					int pageOffset = Integer.parseInt(virtualAddress.substring(2,2), 16);
 					boolean write = instruction == 1;
 
 					data = 0;
@@ -54,20 +52,6 @@ public class CPU {
 		}		
 	}
 	
-	public int convertHexToDecimal(String hex) {
-		int decimal = 0;		
-
-		for (int i = 0; i < hex.length(); ++i) {
-			char hexChar = hex.charAt(hex.length() - 1 - i);
-			int offset = '0';
-			if (hexChar >= 'A' && hexChar <= 'F')
-				offset = 'A';
-			
-			decimal += Math.pow(16,i) * (hexChar - offset);
-		}
-		return decimal;
-	}
-
 	public void resetRbits() {
 		mmu.resetRbits();
 	}
@@ -75,22 +59,4 @@ public class CPU {
 	public void unsetDbit(int virtualPageIndex) {
 		mmu.unsetDbit(virtualPageIndex);
 	}
-	
-	
-	public static void testCPU() throws FileNotFoundException {
-		CPU test = new CPU(16,256,16,256) ;
-		test.readProcesses();
-
-	
-	}
-	
-	public static void main (String [] args) {
-		try {
-			testCPU();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
 }
