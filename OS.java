@@ -1,17 +1,17 @@
 
 public class OS {
 	
-	CircularlyLinkedList<TlbEntries> clock = new CircularlyLinkedList();
+	private static CircularlyLinkedList<TlbEntries> clock = new CircularlyLinkedList();
 	MMU mmu = new MMU();
 	
-	public CircularlyLinkedList<TlbEntries> loadClock(MMU mmu){
+	public static CircularlyLinkedList<TlbEntries> loadClock(MMU mmu){
 		TlbEntries[] rtnTLB = mmu.getTLB();
 		for(TlbEntries i:rtnTLB) {
 			clock.add(i);
 		}
 	}
 	
-	public TlbEntries pageReplacement(TlbEntries replacementEntry) {
+	public static TlbEntries pageReplacement(TlbEntries replacementEntry) {
 		for(int i = 0; i < clock.size; i++) {
 			if(clock.getData().isReferenced()) {
 				TlbEntries rtn = clock.getData();
@@ -22,13 +22,22 @@ public class OS {
 				clock.advance();
 			}
 		}
+		return clock.getData();
 	}
 	
-	public void resetRbit(MMU mmu) {
+	public static void clockEvict(TlbEntries replacementEntry) {
+		TlbEntries t = pageReplacement(replacementEntry);
+		if(t.isDirty()) {
+			//write to hard disk?
+			
+		}
+	}
+	
+	public static void resetRbit(MMU mmu) {
 		mmu.resetRbits();
 	}
 	
-	public void unsetDbit(MMU mmu, int virtualPageIndex) {
+	public static void unsetDbit(MMU mmu, int virtualPageIndex) {
 		mmu.unsetDbit(virtualPageIndex);
 	}
 	
