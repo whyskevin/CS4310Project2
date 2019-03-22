@@ -37,7 +37,8 @@ public class Driver {
     
     public static void diskWrite(MMU mmu, int virtualPageIndex, int physicalPageIndex, String pageFileDir) {
         try {
-            PrintWriter writer = new PrintWriter(pageFileDir + "/" + Integer.toString(virtualPageIndex, 16) + ".pg");
+            File file = new File(pageFileDir + "/" + Integer.toString(virtualPageIndex, 16) + ".pg");
+            PrintWriter writer = new PrintWriter(file);
             
             for (int i = 0; i < mmu.getPhysicalMem().length; ++i) {
                 for (int j = 0; j < mmu.getPhysicalMem()[i].length; ++j)
