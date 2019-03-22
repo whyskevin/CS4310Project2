@@ -3,7 +3,7 @@ public class MMU {
 	
 	private TlbEntries[] TLB;
 	private VirtualPageTableEntries[] pageTable;
-	private int[][] physicalMem;
+	private int[][]          ;
 	private int TLBPageReplacementCounter = 0;	//is "pageToReplaceInTLB" a counter? It keeps a reference to which page to be replaced.
 	
 	public MMU(int tlbSize, int numVirtualPages, int numPhysicalPages, int pageSize) {
@@ -105,20 +105,22 @@ public class MMU {
 		int TLB_Flag = checkTLB(virtualPageIndex);
 		if(TLB_Flag >= 0) {	//The entry exists in the TLB
 			TlbEntries presentEntry = TLB[TLB_Flag];
+			
+			presentEntry.setRbit(true);
 			if(write) {	//Writing
-				setPhysicalMem(presentEntry.getVirtualPageNum(),physicalOffset,data);
+				setPhysicalMem(presentEntry.getPageFrameNum(),physicalOffset,data);
 				presentEntry.setDbit(true);
 			}else {	//Reading
-				presentEntry.setRbit(true);
 			}
 		}else {	//The entry doesn't exist in the TLB
 			int checkResult = checkVirtualPageTable(virtualPageIndex);	//Now check the page table
 			if(checkResult >= 0) {	//Soft miss
 				//Get the entry from the page table
 				//Now replace the oldest entry in the TLB with the entry
+				pageTable[checkResult].setRbit(true);
 				VirtualPageTableEntries retrievedEntry = pageTable[checkResult];
-				retrievedEntry.setVbit(true);
-				retrievedEntry.setRbit(true);
+				// retrievedEntry.setVbit(true);
+				// retrievedEntry.setRbit(true);
 				TlbEntries replacementEntry = new TlbEntries(virtualPageIndex,
 						retrievedEntry.isValid(),
 						retrievedEntry.isReferenced(),
@@ -126,6 +128,7 @@ public class MMU {
 						retrievedEntry.getPageFrameNum());
 				addTLBEntry(replacementEntry);
 			}else{	//Hard miss
+			//TODO: hard miss
 			}
 		}
 	}
