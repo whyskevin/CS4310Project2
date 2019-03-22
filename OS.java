@@ -12,15 +12,13 @@ public class OS {
 	}
 	
 	public static TlbEntries pageReplacement(TlbEntries replacementEntry) {
-		for(int i = 0; i < clock.size; i++) {
-			if(clock.getData().isReferenced()) {
-				TlbEntries rtn = clock.getData();
-				clock.setData(replacementEntry);
-				return rtn;
-			} else {
-				clock.getData().setRbit(false);
-				clock.advance();
-			}
+		if(clock.getData().isReferenced()) {
+			TlbEntries rtn = clock.getData();
+			clock.setData(replacementEntry);
+			return rtn;
+		} else {
+			clock.getData().setRbit(false);
+			clock.advance();
 		}
 		return clock.getData();
 	}
