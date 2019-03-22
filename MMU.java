@@ -3,7 +3,7 @@ public class MMU {
 	
 	private TlbEntries[] TLB;
 	private VirtualPageTableEntries[] pageTable;
-	private int[][]          ;
+	private int[][] physicalMem;
 	private int TLBPageReplacementCounter = 0;	//is "pageToReplaceInTLB" a counter? It keeps a reference to which page to be replaced.
 	
 	public MMU(int tlbSize, int numVirtualPages, int numPhysicalPages, int pageSize) {
