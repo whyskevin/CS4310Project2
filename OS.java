@@ -1,14 +1,15 @@
+import java.io.FileNotFoundException;
 
 public class OS {
 	
 	private static CircularlyLinkedList<TlbEntries> clock = new CircularlyLinkedList();
-	MMU mmu = new MMU();
 	
 	public static CircularlyLinkedList<TlbEntries> loadClock(MMU mmu){
 		TlbEntries[] rtnTLB = mmu.getTLB();
 		for(TlbEntries i:rtnTLB) {
 			clock.add(i);
 		}
+		return clock;
 	}
 	
 	public static TlbEntries pageReplacement(TlbEntries replacementEntry) {
@@ -37,6 +38,10 @@ public class OS {
 	
 	public static void unsetDbit(MMU mmu, int virtualPageIndex) {
 		mmu.unsetDbit(virtualPageIndex);
+	}
+	
+	public static void readProcesses(CPU cpu) throws FileNotFoundException {
+		cpu.readProcesses();
 	}
 	
 }
