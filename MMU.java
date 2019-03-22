@@ -101,15 +101,15 @@ public class MMU {
 		TLBPageReplacementCounter = (TLBPageReplacementCounter + 1) % TLB.length;
 	}
 	
-	public int processInstruction(int virtualPageIndex, int physicalOffset , boolean read, int data) {
+	public void processInstruction(int virtualPageIndex, int physicalOffset , boolean write, int data) {
 		int TLB_Flag = checkTLB(virtualPageIndex);
 		if(TLB_Flag >= 0) {	//The entry exists in the TLB
 			TlbEntries presentEntry = TLB[TLB_Flag];
-			if(read) {	//Reading
-				presentEntry.setRbit(true);
-			}else {	//Writing
+			if(write) {	//Writing
 				setPhysicalMem(presentEntry.getVirtualPageNum(),physicalOffset,data);
 				presentEntry.setDbit(true);
+			}else {	//Reading
+				presentEntry.setRbit(true);
 			}
 		}else {	//The entry doesn't exist in the TLB
 			int checkResult = checkVirtualPageTable(virtualPageIndex);	//Now check the page table
@@ -126,10 +126,8 @@ public class MMU {
 						retrievedEntry.getPageFrameNum());
 				addTLBEntry(replacementEntry);
 			}else{	//Hard miss
-				return -1;
 			}
 		}
-		return 0;
 	}
 
 
