@@ -18,31 +18,33 @@ public class Driver {
     public static CPU cpu = new CPU();
     public static MMU mmu = new MMU(TLB_SIZE, NUM_VIRTUAL_PAGES, NUM_PHYSICAL_PAGES, PAGE_SIZE);
     
-    public static String pageFileDir = "Project2_test_and_page_files/page_files";
-
     
-    public static void diskLoad(MMU mmu, int virtualPageIndex, int physicalPageIndex, String pageFileDir) {
+    public static String pageFileDir = "Project2_test_and_page_files/page_files";
+    public static String testDataDir = "Project2_test_and_page_files/test_files";
+    
+    public static void diskLoad(VirtualPageTableEntries entry, int virtualPageNum, String pageFileDir) {
         try {
         
-            File file = new File(pageFileDir + "/" + Integer.toString(virtualPageIndex, 16) + ".pg");
+            File file = new File(pageFileDir + "/" + Integer.toString(virtualPageNum, 16) + ".pg");
             Scanner sc = new Scanner(file);
             
-            for (int i = 0; i < mmu.getPhysicalMem()[physicalPageIndex].length; ++i)
-                mmu.getPhysicalMem()[physicalPageIndex][i] = sc.nextInt();
+            for (int i = 0; i < Driver.mmu.getPhysicalMem()[0].length; ++i)
+                Driver.mmu.getPhysicalMem()[entry.getPageFrameNum()][i] = sc.nextInt();
+            
+            sc.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        
     }
     
-    public static void diskWrite(MMU mmu, int virtualPageIndex, int physicalPageIndex, String pageFileDir) {
+    public static void diskWrite(VirtualPageTableEntries entry, int virtualPageNum, String pageFileDir) {
         try {
-            PrintWriter writer = new PrintWriter(pageFileDir + "/" + Integer.toString(virtualPageIndex, 16) + ".pg");
+            File file = new File(pageFileDir + "/" + Integer.toString(virtualPageNum, 16) + ".pg");
+            PrintWriter writer = new PrintWriter(file);
             
-            for (int i = 0; i < mmu.getPhysicalMem().length; ++i) {
-                for (int j = 0; j < mmu.getPhysicalMem()[i].length; ++j)
-                    writer.println(mmu.getPhysicalMem()[i][j]);
-            }
+            for (int i = 0; i < Driver.mmu.getPhysicalMem()[0].length; ++i)
+                    writer.println(Driver.mmu.getPhysicalMem()[entry.getPageFrameNum()][i]);
+                    
             writer.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -50,16 +52,17 @@ public class Driver {
     } 
     
     public static void main(String[] args) {
-        int vp = 24;
-        int pf = 1;
-        diskWrite(mmu, 24, 1, pageFileDir);
-        
-        for (int i = 0; i < mmu.getPhysicalMem().length; ++i) {
-            for (int j = 0; j < mmu.getPhysicalMem()[i].length; ++j)
-                System.out.println(mmu.getPhysicalMem()[i][j] + " ");
-            System.out.println();
-        }
-        
-        return;
+    	readDirectories();
     }
+    
+    public static void readDirectories() {
+    	File file = new File(testDataDir + "test_1.txt");
+    	try {
+			os.runProcess(file);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
 }

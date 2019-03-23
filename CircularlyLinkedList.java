@@ -24,6 +24,10 @@ public class CircularlyLinkedList<T> {
 		size = 0;
 	}
 	
+	public void setData(T newData) {
+		cursor.data = newData;
+	}
+	
 	/** Gets the data of the cursor
 	 * 	@return current cursor data */
 	public T getData(){
