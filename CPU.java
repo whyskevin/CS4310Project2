@@ -32,8 +32,8 @@ public class CPU {
 					String virtualPageStr = virtualAddress.substring(0,2);
 					String pageOffsetStr = virtualAddress.substring(2,4);
 
-					int virtualPage = Integer.parseInt(virtualAddress.substring(0,2), 16);
-					int pageOffset = Integer.parseInt(virtualAddress.substring(2,2), 16);
+					int virtualPage = Integer.valueOf(virtualAddress.substring(0,2), 16);
+					int pageOffset = Integer.valueOf(virtualAddress.substring(2,2), 16);
 					boolean write = instruction == 1;
 
 					data = 0;

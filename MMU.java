@@ -105,20 +105,22 @@ public class MMU {
 		int TLB_Flag = checkTLB(virtualPageIndex);
 		if(TLB_Flag >= 0) {	//The entry exists in the TLB
 			TlbEntries presentEntry = TLB[TLB_Flag];
+			
+			presentEntry.setRbit(true);
 			if(write) {	//Writing
-				setPhysicalMem(presentEntry.getVirtualPageNum(),physicalOffset,data);
+				setPhysicalMem(presentEntry.getPageFrameNum(),physicalOffset,data);
 				presentEntry.setDbit(true);
 			}else {	//Reading
-				presentEntry.setRbit(true);
 			}
 		}else {	//The entry doesn't exist in the TLB
 			int checkResult = checkVirtualPageTable(virtualPageIndex);	//Now check the page table
 			if(checkResult >= 0) {	//Soft miss
 				//Get the entry from the page table
 				//Now replace the oldest entry in the TLB with the entry
+				pageTable[checkResult].setRbit(true);
 				VirtualPageTableEntries retrievedEntry = pageTable[checkResult];
-				retrievedEntry.setVbit(true);
-				retrievedEntry.setRbit(true);
+				// retrievedEntry.setVbit(true);
+				// retrievedEntry.setRbit(true);
 				TlbEntries replacementEntry = new TlbEntries(virtualPageIndex,
 						retrievedEntry.isValid(),
 						retrievedEntry.isReferenced(),
