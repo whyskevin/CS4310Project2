@@ -22,6 +22,9 @@ public class OS {
 			if(!clock.getData().isReferenced()) {
 				VirtualPageTableEntries rtn = clock.getData();
 				clock.setData(replacementEntry);
+				
+				Driver.setEvicted(rtn.getPageFrameNum());
+				
 				return rtn;
 			} else {
 				clock.getData().setRbit(false);
@@ -31,8 +34,10 @@ public class OS {
 		}
 		if(clock.getData().isDirty()) {
 			//write to hard disk?
+			Driver.dirtyEvicted(true);
 			diskWrite(clock.getData(), virtualPageNum);
 		}
+		Driver.setEvicted(clock.getData().getPageFrameNum());
 		return clock.getData();
 	}
 
@@ -68,16 +73,21 @@ public class OS {
 				int pageOffset = Integer.valueOf(virtualAddress.substring(2,2), 16);
 				boolean write = instruction == 1;
 
+				Driver.setAddress(virtualAddress);
+				Driver.setWrite(write);
+
 				data = 0;
 				if (write)
 					data = in.nextInt();
 				try {
 					Driver.cpu.readInstruction(virtualPage, pageOffset, write, data);
+					Driver.outputToCSV();
 				}catch(Exception e){	//Hard miss
 					System.out.println(e.getMessage());
 					
 					int pageNum = pageReplacement(Driver.mmu.getPageTable()[virtualPage], virtualPage).getPageFrameNum();
 					diskLoad(virtualPage, pageNum);
+					Driver.outputToCSV();
 					Driver.cpu.readInstruction(virtualPage, pageOffset, write, data);					
 					
 				}

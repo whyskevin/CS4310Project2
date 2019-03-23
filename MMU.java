@@ -103,35 +103,50 @@ public class MMU {
 	
 	public void processInstruction(int virtualPageIndex, int physicalOffset , boolean write, int data) {
 		int TLB_Flag = checkTLB(virtualPageIndex);
+		TlbEntries presentEntry;
+		
+		Driver.setEvicted(-1);
+		Driver.dirtyEvictedPage(false);
+		
 		if(TLB_Flag >= 0) {	//The entry exists in the TLB
-			TlbEntries presentEntry = TLB[TLB_Flag];
-			
-			presentEntry.setRbit(true);
-			if(write) {	//Writing
-				setPhysicalMem(presentEntry.getPageFrameNum(),physicalOffset,data);
-				presentEntry.setDbit(true);
-			}else {	//Reading
-			}
-		}else {	//The entry doesn't exist in the TLB
+			presentEntry = TLB[TLB_Flag];
+			Driver.softMiss(false);
+			Driver.hardMiss(false);
+			Driver.hit(true);
+		} else {	//The entry doesn't exist in the TLB
+			Driver.hit(false);
 			int checkResult = checkVirtualPageTable(virtualPageIndex);	//Now check the page table
 			if(checkResult >= 0) {	//Soft miss
 				//Get the entry from the page table
 				//Now replace the oldest entry in the TLB with the entry
 				pageTable[checkResult].setRbit(true);
 				VirtualPageTableEntries retrievedEntry = pageTable[checkResult];
-				// retrievedEntry.setVbit(true);
-				// retrievedEntry.setRbit(true);
 				TlbEntries replacementEntry = new TlbEntries(virtualPageIndex,
 						retrievedEntry.isValid(),
 						retrievedEntry.isReferenced(),
 						retrievedEntry.isDirty(),
 						retrievedEntry.getPageFrameNum());
 				addTLBEntry(replacementEntry);
-			}else{	//Hard miss
+				presentEntry = replacementEntry;
+		
+				Driver.softMiss(true);
+				Driver.hardMiss(false);
+			} else{	//Hard miss
+				Driver.softMiss(false);
+				Driver.hardMiss(true);
 				throw new MissingResourceException("Cannot find " + virtualPageIndex + " in the page table.", "VirtualPageEntries", String.valueOf(virtualPageIndex));
 				//Throws to CPU readInstruction()
 			}
 		}
+		presentEntry.setRbit(true);
+		if(write) {	//Writing
+			setPhysicalMem(presentEntry.getPageFrameNum(),physicalOffset,data);
+			presentEntry.setDbit(true);
+		}else {	//Reading
+			data = physicalMem[presentEntry.getPageFrameNum()][physicalOffset];
+		}
+		
+		Driver.setValue(data);
 	}
 
 
