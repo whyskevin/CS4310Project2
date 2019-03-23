@@ -1,13 +1,11 @@
 import java.lang.Math;
-import java.io.File;
 import java.util.Scanner;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.*;
 
 public class Driver {
     public static final int CPU_ADDRESS_WIDTH = 16;
-    public static final int PHYSICAL_ADDRESS_WIDTH = 4;
-    public static final int PAGE_OFFSET = 2;
+    public static final int PHYSICAL_ADDRESS_WIDTH = 12;
+    public static final int PAGE_OFFSET = 8;
     public static final int TLB_SIZE = 16;
 
     public static int NUM_VIRTUAL_PAGES = (int) Math.pow(2, CPU_ADDRESS_WIDTH - PAGE_OFFSET);
@@ -24,7 +22,7 @@ public class Driver {
     
     public static String address, write, value, soft, hard, hit, evictedPageNum, dirtyEvictedPage;
     
-    public static FileWriter outputFile;
+    public static PrintWriter outputFile;
     
     public static void setAddress(String addr) {
         address = addr;
@@ -58,49 +56,35 @@ public class Driver {
         dirtyEvictedPage = Boolean.toString(dirty);
     }
     
-    public static void csvHeader() {
+    public static void csvHeader() throws IOException {
         outputFile.write("Address, r/w, value, soft, hard, hit, evicted_pg#, dirty_evicted_page,\n");
     }
     
-    public static void outputToCSV() {
+    public static void outputToCSV() throws IOException {
         outputFile.write(address + ", " + write + ", " + value + ", " +
                         soft + ", " + hard + ", " + hit + ", " +
                         evictedPageNum + ", " + dirtyEvictedPage + ",\n");
     }
     
-    public static void diskLoad(VirtualPageTableEntries entry, int virtualPageNum, String pageFileDir) {
-        try {
-        
-            File file = new File(pageFileDir + "/" + Integer.toString(virtualPageNum, 16) + ".pg");
-            Scanner sc = new Scanner(file);
-            
-            for (int i = 0; i < Driver.mmu.getPhysicalMem()[0].length; ++i)
-                Driver.mmu.getPhysicalMem()[entry.getPageFrameNum()][i] = sc.nextInt();
-            
-            sc.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+    public static String zeroPad(String s) {
+    	if (s.length() < 2)
+    		return "0" + s;
+    	return s;
     }
     
-    public static void diskWrite(VirtualPageTableEntries entry, int virtualPageNum, String pageFileDir) {
-        try {
-            File file = new File(pageFileDir + "/" + Integer.toString(virtualPageNum, 16) + ".pg");
-            PrintWriter writer = new PrintWriter(file);
-            
-            for (int i = 0; i < Driver.mmu.getPhysicalMem()[0].length; ++i)
-                    writer.println(Driver.mmu.getPhysicalMem()[entry.getPageFrameNum()][i]);
-                    
-            writer.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-    } 
-    
     public static void main(String[] args) {
-        String arg = testDataDir + "test_1.txt";
-        outputFile = new FileWriter("test" + arg.substring(arg.indexOf("_"), 2) + ".csv");
-    	readDirectories(fname);
+        String arg = testDataDir + "/test_1.txt";
+        OS.loadClock();
+        
+        System.out.println(mmu.getPhysicalMem().length);
+        try {
+			outputFile = new PrintWriter(arg.substring(0, arg.indexOf('.')) + ".csv");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	readDirectories(arg);
+    	outputFile.close();
     }
     
     public static void readDirectories(String fname) {

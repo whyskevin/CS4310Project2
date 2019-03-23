@@ -8,7 +8,13 @@ public class MMU {
 	
 	public MMU(int tlbSize, int numVirtualPages, int numPhysicalPages, int pageSize) {
 		TLB = new TlbEntries[tlbSize];
+		for (int i = 0; i < tlbSize; ++i)
+			TLB[i] = new TlbEntries();
+		
 		pageTable = new VirtualPageTableEntries[numVirtualPages];
+		for (int i = 0; i < numVirtualPages; ++i)
+			pageTable[i] = new VirtualPageTableEntries();
+		
 		physicalMem = new int[numPhysicalPages][pageSize];
 	}
 
@@ -105,9 +111,6 @@ public class MMU {
 		int TLB_Flag = checkTLB(virtualPageIndex);
 		TlbEntries presentEntry;
 		
-		Driver.setEvicted(-1);
-		Driver.dirtyEvictedPage(false);
-		
 		if(TLB_Flag >= 0) {	//The entry exists in the TLB
 			presentEntry = TLB[TLB_Flag];
 			Driver.softMiss(false);
@@ -119,8 +122,8 @@ public class MMU {
 			if(checkResult >= 0) {	//Soft miss
 				//Get the entry from the page table
 				//Now replace the oldest entry in the TLB with the entry
-				pageTable[checkResult].setRbit(true);
-				VirtualPageTableEntries retrievedEntry = pageTable[checkResult];
+				pageTable[virtualPageIndex].setRbit(true);
+				VirtualPageTableEntries retrievedEntry = pageTable[virtualPageIndex];
 				TlbEntries replacementEntry = new TlbEntries(virtualPageIndex,
 						retrievedEntry.isValid(),
 						retrievedEntry.isReferenced(),
@@ -128,7 +131,6 @@ public class MMU {
 						retrievedEntry.getPageFrameNum());
 				addTLBEntry(replacementEntry);
 				presentEntry = replacementEntry;
-		
 				Driver.softMiss(true);
 				Driver.hardMiss(false);
 			} else{	//Hard miss

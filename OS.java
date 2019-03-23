@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
@@ -7,31 +8,35 @@ public class OS {
 
 	private static CircularlyLinkedList<VirtualPageTableEntries> clock = new CircularlyLinkedList();
 
-	public static CircularlyLinkedList<VirtualPageTableEntries> loadClock(MMU mmu){
-		VirtualPageTableEntries[] rtnPT = mmu.getPageTable();
+	public static CircularlyLinkedList<VirtualPageTableEntries> loadClock(){
+		VirtualPageTableEntries[] rtnPT = Driver.mmu.getPageTable();		
 		for(VirtualPageTableEntries i:rtnPT) {
 			clock.add(i);
 		}
+//		
+//		for (int i = 0; i < Driver.TLB_SIZE; ++i) {
+//			clock.getData().setPageFrameNum(i);
+//			clock.advance();
+//		}
 		return clock;
 
 
 	}
 
 	public static VirtualPageTableEntries pageReplacement(VirtualPageTableEntries replacementEntry, int virtualPageNum) {
-		for(int i = 0; i < clock.size; i++) {
+		if(clock.length() == 0)	return null;
+		for(int i = 0; i < clock.length(); i++) {
 			if(!clock.getData().isReferenced()) {
 				VirtualPageTableEntries rtn = clock.getData();
 				clock.setData(replacementEntry);
-				
 				Driver.setEvicted(rtn.getPageFrameNum());
-				
 				return rtn;
 			} else {
 				clock.getData().setRbit(false);
-				//changePageTableEntry(clock.getData(), mmu);
 				clock.advance();
 			}
 		}
+		System.out.println("clock size: "+ clock.length());
 		if(clock.getData().isDirty()) {
 			//write to hard disk?
 			Driver.dirtyEvicted(true);
@@ -40,17 +45,6 @@ public class OS {
 		Driver.setEvicted(clock.getData().getPageFrameNum());
 		return clock.getData();
 	}
-
-	/*public static void chagePageTableEntry(TlbEntries entry, MMU mmu) {
-		int virtualPageIndex = entry.getVirtualPageNum();
-		mmu.getPageTable()[virtualPageIndex].setRbit(false);
-	}*/
-
-	//return pageframenum
-//	public static void clockEvict(VirtualPageTableEntries replacementEntry) throws FileNotFoundException {
-//		//VirtualPageTableEntries entry = pageReplacement(replacementEntry);
-//
-//	}
 
 	//Passed in a File from Driver class and begins Scanning File contents
 	public static void runProcess(File fileToRead) throws FileNotFoundException {
@@ -66,11 +60,8 @@ public class OS {
 
 				//grabbing virtual address and splitting
 				String virtualAddress = in.next();
-				String virtualPageStr = virtualAddress.substring(0,2);
-				String pageOffsetStr = virtualAddress.substring(2,4);
-
 				int virtualPage = Integer.valueOf(virtualAddress.substring(0,2), 16);
-				int pageOffset = Integer.valueOf(virtualAddress.substring(2,2), 16);
+				int pageOffset = Integer.valueOf(virtualAddress.substring(2,4), 16);
 				boolean write = instruction == 1;
 
 				Driver.setAddress(virtualAddress);
@@ -80,16 +71,34 @@ public class OS {
 				if (write)
 					data = in.nextInt();
 				try {
+					Driver.setEvicted(-1);
+					Driver.dirtyEvicted(false);
 					Driver.cpu.readInstruction(virtualPage, pageOffset, write, data);
 					Driver.outputToCSV();
 				}catch(Exception e){	//Hard miss
-					System.out.println(e.getMessage());
+//					System.out.println(e.getMessage());					
+					int pageNum = 0;
+					if(pageReplacement(Driver.mmu.getPageTable()[virtualPage], virtualPage) == null) {
+						pageNum = 0;
+					} else {
+						pageNum = pageReplacement(Driver.mmu.getPageTable()[virtualPage], virtualPage).getPageFrameNum();
+					}
+					if (pageNum < 0) 
+						pageNum = 0;
 					
-					int pageNum = pageReplacement(Driver.mmu.getPageTable()[virtualPage], virtualPage).getPageFrameNum();
-					diskLoad(virtualPage, pageNum);
-					Driver.outputToCSV();
-					Driver.cpu.readInstruction(virtualPage, pageOffset, write, data);					
+					diskLoad(pageNum, virtualPage);
+
+					Driver.cpu.readInstruction(virtualPage, pageOffset, write, data);
 					
+					Driver.softMiss(false);
+					Driver.hardMiss(true);
+					
+					try {
+						Driver.outputToCSV();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 				}
 			}
 			resetRbit();
@@ -103,7 +112,7 @@ public class OS {
     public static void diskLoad( int pageFrameNumber, int virtualPageNum) {
         try {
             
-            File file = new File(Driver.pageFileDir + "/" + Integer.toString(virtualPageNum, 16) + ".pg");
+            File file = new File(Driver.pageFileDir + "/" + Driver.zeroPad(Integer.toString(virtualPageNum, 16)) + ".pg");
             Scanner sc = new Scanner(file);
             
             for (int i = 0; i < Driver.mmu.getPhysicalMem()[0].length; ++i)
@@ -113,6 +122,7 @@ public class OS {
            Driver.mmu.getPageTable()[virtualPageNum].setRbit(true);
            Driver.mmu.getPageTable()[virtualPageNum].setDbit(false);
            Driver.mmu.getPageTable()[virtualPageNum].setPageFrameNum(pageFrameNumber);
+           System.out.println(Driver.mmu.getPageTable()[virtualPageNum]);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

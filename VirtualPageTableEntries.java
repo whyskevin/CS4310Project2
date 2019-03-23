@@ -9,7 +9,7 @@ public class VirtualPageTableEntries {
 		Vbit = false;
 		Rbit = false;
 		Dbit = false;
-		pageFrameNum = -1;
+		pageFrameNum = 0;
 	}
 	
 	//Loaded pages will be present and referenced (true).

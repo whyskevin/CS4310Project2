@@ -16,7 +16,7 @@ public class CPU {
 		try {
 			Driver.mmu.processInstruction(virtualPage, pageOffset, write, data);
 		} catch (Exception e) {
-			System.out.println(e.toString());
+//			System.out.println(e.toString());
 			throw e;
 		}
 	}
