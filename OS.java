@@ -10,14 +10,15 @@ public class OS {
 
 	public static CircularlyLinkedList<VirtualPageTableEntries> loadClock(){
 		VirtualPageTableEntries[] rtnPT = Driver.mmu.getPageTable();		
-		for(VirtualPageTableEntries i:rtnPT) {
-			clock.add(i);
+		for(int i = 0; i < Driver.TLB_SIZE; ++i) {
+//			System.out.println(i);
+			clock.add(rtnPT[i]);
 		}
-//		
-//		for (int i = 0; i < Driver.TLB_SIZE; ++i) {
-//			clock.getData().setPageFrameNum(i);
-//			clock.advance();
-//		}
+		
+		for (int i = 0; i < Driver.TLB_SIZE; ++i) {
+			clock.getData().setPageFrameNum(i);
+			clock.advance();
+		}
 		return clock;
 
 
@@ -30,6 +31,7 @@ public class OS {
 				VirtualPageTableEntries rtn = clock.getData();
 				clock.setData(replacementEntry);
 				Driver.setEvicted(rtn.getPageFrameNum());
+				Driver.mmu.getPageTable()[virtualPageNum].setPageFrameNum(rtn.getPageFrameNum());
 				return rtn;
 			} else {
 				clock.getData().setRbit(false);
@@ -45,7 +47,11 @@ public class OS {
 		Driver.setEvicted(clock.getData().getPageFrameNum());
 		return clock.getData();
 	}
-
+//
+//	public static void changePageTableEntry(int virtualPageNum) {
+//		Driver.mmu.getPageTable()[virtualPageNum].setPageFrameNum(pageFrameNum);
+//	}
+	
 	//Passed in a File from Driver class and begins Scanning File contents
 	public static void runProcess(File fileToRead) throws FileNotFoundException {
 		boolean read = false;
@@ -122,7 +128,7 @@ public class OS {
            Driver.mmu.getPageTable()[virtualPageNum].setRbit(true);
            Driver.mmu.getPageTable()[virtualPageNum].setDbit(false);
            Driver.mmu.getPageTable()[virtualPageNum].setPageFrameNum(pageFrameNumber);
-           System.out.println(Driver.mmu.getPageTable()[virtualPageNum]);
+//           System.out.println(Driver.mmu.getPageTable()[virtualPageNum]);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

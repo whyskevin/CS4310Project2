@@ -79,6 +79,7 @@ public class Driver {
         System.out.println(mmu.getPhysicalMem().length);
         try {
 			outputFile = new PrintWriter(arg.substring(0, arg.indexOf('.')) + ".csv");
+			csvHeader();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
