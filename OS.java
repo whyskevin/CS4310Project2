@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 public class OS {
 
-	private static CircularlyLinkedList<VirtualPageTableEntries> clock = new CircularlyLinkedList();
+	private static CircularlyLinkedList<VirtualPageTableEntries> clock = new CircularlyLinkedList<VirtualPageTableEntries>();
 
 	public static CircularlyLinkedList<VirtualPageTableEntries> loadClock(){
 		VirtualPageTableEntries[] rtnPT = Driver.mmu.getPageTable();		
@@ -14,14 +14,11 @@ public class OS {
 //			System.out.println(i);
 			clock.add(rtnPT[i]);
 		}
-		
 		for (int i = 0; i < Driver.TLB_SIZE; ++i) {
 			clock.getData().setPageFrameNum(i);
 			clock.advance();
 		}
 		return clock;
-
-
 	}
 
 	public static VirtualPageTableEntries pageReplacement(VirtualPageTableEntries replacementEntry, int virtualPageNum) {
@@ -30,7 +27,9 @@ public class OS {
 			if(!clock.getData().isReferenced()) {
 				VirtualPageTableEntries rtn = clock.getData();
 				clock.setData(replacementEntry);
-				Driver.setEvicted(rtn.getPageFrameNum());
+//				if (counter++ > Driver.TLB_SIZE)
+					Driver.setEvicted(rtn.getPageFrameNum());
+				
 				Driver.mmu.getPageTable()[virtualPageNum].setPageFrameNum(rtn.getPageFrameNum());
 				return rtn;
 			} else {

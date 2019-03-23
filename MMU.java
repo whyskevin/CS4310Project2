@@ -147,7 +147,6 @@ public class MMU {
 		}else {	//Reading
 			data = physicalMem[presentEntry.getPageFrameNum()][physicalOffset];
 		}
-		
 		Driver.setValue(data);
 	}
 

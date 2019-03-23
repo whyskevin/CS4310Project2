@@ -73,10 +73,11 @@ public class Driver {
     }
     
     public static void main(String[] args) {
-        String arg = testDataDir + "/test_1.txt";
+//        String arg = testDataDir + "/test_1.txt";
+    	String arg = args[0];
         OS.loadClock();
         
-        System.out.println(mmu.getPhysicalMem().length);
+//        System.out.println(mmu.getPhysicalMem().length);
         try {
 			outputFile = new PrintWriter(arg.substring(0, arg.indexOf('.')) + ".csv");
 			csvHeader();
