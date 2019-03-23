@@ -15,14 +15,16 @@ public class OS {
 	}
 	
 	public static VirtualPageTableEntries pageReplacement(VirtualPageTableEntries replacementEntry) {
-		if(clock.getData().isReferenced()) {
-			VirtualPageTableEntries rtn = clock.getData();
-			clock.setData(replacementEntry);
-			return rtn;
-		} else {
-			clock.getData().setRbit(false);
-			//changePageTableEntry(clock.getData(), mmu);
-			clock.advance();
+		for(int i = 0; i < clock.size; i++) {
+			if(clock.getData().isReferenced()) {
+				VirtualPageTableEntries rtn = clock.getData();
+				clock.setData(replacementEntry);
+				return rtn;
+			} else {
+				clock.getData().setRbit(false);
+				//changePageTableEntry(clock.getData(), mmu);
+				clock.advance();
+			}
 		}
 		return clock.getData();
 	}
@@ -33,11 +35,12 @@ public class OS {
 	}*/
 	
 	public static void clockEvict(VirtualPageTableEntries replacementEntry) throws FileNotFoundException {
-		VirtualPageTableEntries t = pageReplacement(replacementEntry);
-		if(t.isDirty()) {
+		VirtualPageTableEntries entry = pageReplacement(replacementEntry);
+		if(entry.isDirty()) {
 			//write to hard disk?
-			diskWrite(t);
+			diskWrite(entry);
 		}
+
 	}
 	
 	public static void diskWrite(VirtualPageTableEntries t) throws FileNotFoundException {
