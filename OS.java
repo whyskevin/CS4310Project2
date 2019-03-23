@@ -5,7 +5,7 @@ public class OS {
 	private static CircularlyLinkedList<TlbEntries> clock = new CircularlyLinkedList();
 	
 	public static CircularlyLinkedList<TlbEntries> loadClock(MMU mmu){
-		TlbEntries[] rtnTLB = mmu.getTLB();
+		TlbEntries[] rtnTLB = new TlbEntries[mmu.getPhysicalMem().length];
 		for(TlbEntries i:rtnTLB) {
 			clock.add(i);
 		}
@@ -42,6 +42,11 @@ public class OS {
 	
 	public static void resetRbit(MMU mmu) {
 		mmu.resetRbits();
+		
+		for (int i = 0; i < clock.length(); ++i) {
+			clock.getData().setRbit(false);
+			clock.advance();
+		}
 	}
 	
 	public static void unsetDbit(MMU mmu, int virtualPageIndex) {
