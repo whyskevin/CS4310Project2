@@ -22,6 +22,52 @@ public class Driver {
     public static String pageFileDir = "Project2_test_and_page_files/page_files";
     public static String testDataDir = "Project2_test_and_page_files/test_files";
     
+    public static String address, write, value, soft, hard, hit, evictedPageNum, dirtyEvictedPage;
+    
+    public static FileWriter outputFile;
+    
+    public static void setAddress(String addr) {
+        address = addr;
+    }
+    
+    public static void setWrite(boolean wt) {
+        write = Boolean.toString(wt);
+    }
+    
+    public static void setValue(int val) {
+        value = Integer.toString(val);
+    }
+    
+    public static void softMiss(boolean miss) {
+        soft = Boolean.toString(miss);
+    }
+    
+    public static void hardMiss(boolean miss) {
+        hard = Boolean.toString(miss);
+    }
+    
+    public static void hit(boolean _hit) {
+        hit = Boolean.toString(_hit);
+    }
+    
+    public static void setEvicted(int pgNum) {
+        evictedPageNum = Integer.toString(pgNum);
+    }
+    
+    public static void dirtyEvicted(boolean dirty) {
+        dirtyEvictedPage = Boolean.toString(dirty);
+    }
+    
+    public static void csvHeader() {
+        outputFile.write("Address, r/w, value, soft, hard, hit, evicted_pg#, dirty_evicted_page,\n");
+    }
+    
+    public static void outputToCSV() {
+        outputFile.write(address + ", " + write + ", " + value + ", " +
+                        soft + ", " + hard + ", " + hit + ", " +
+                        evictedPageNum + ", " + dirtyEvictedPage + ",\n");
+    }
+    
     public static void diskLoad(VirtualPageTableEntries entry, int virtualPageNum, String pageFileDir) {
         try {
         
@@ -52,11 +98,13 @@ public class Driver {
     } 
     
     public static void main(String[] args) {
-    	readDirectories();
+        String arg = testDataDir + "test_1.txt";
+        outputFile = new FileWriter("test" + arg.substring(arg.indexOf("_"), 2) + ".csv");
+    	readDirectories(fname);
     }
     
-    public static void readDirectories() {
-    	File file = new File(testDataDir + "test_1.txt");
+    public static void readDirectories(String fname) {
+    	File file = new File(fname);
     	try {
 			os.runProcess(file);
 		} catch (FileNotFoundException e) {
@@ -64,5 +112,4 @@ public class Driver {
 			e.printStackTrace();
 		}
     }
-    
 }
