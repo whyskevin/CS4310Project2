@@ -75,7 +75,7 @@ public class Driver {
     public static void main(String[] args) {
 //        String arg = testDataDir + "/test_1.txt";
     	String arg = args[0];
-        OS.loadClock();
+        // OS.loadClock();
         
 //        System.out.println(mmu.getPhysicalMem().length);
         try {

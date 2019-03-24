@@ -8,48 +8,39 @@ public class OS {
 
 	private static CircularlyLinkedList<VirtualPageTableEntries> clock = new CircularlyLinkedList<VirtualPageTableEntries>();
 
-	public static CircularlyLinkedList<VirtualPageTableEntries> loadClock(){
-		VirtualPageTableEntries[] rtnPT = Driver.mmu.getPageTable();		
-		for(int i = 0; i < Driver.TLB_SIZE; ++i) {
-//			System.out.println(i);
-			clock.add(rtnPT[i]);
-		}
-		for (int i = 0; i < Driver.TLB_SIZE; ++i) {
-			clock.getData().setPageFrameNum(i);
-			clock.advance();
-		}
-		return clock;
-	}
-
-	public static VirtualPageTableEntries pageReplacement(VirtualPageTableEntries replacementEntry, int virtualPageNum) {
-		if(clock.length() == 0)	return null;
+	public static int pageReplacement(VirtualPageTableEntries replacementEntry, int virtualPageNum) {
+		//Logic before the clock is filled
+		if(clock.length() < Driver.NUM_PHYSICAL_PAGES) {
+			int pageNum = clock.length();
+			clock.add(replacementEntry);
+			replacementEntry.setPageFrameNum(pageNum);
+			return pageNum;
+		};
+		
+		//Logic for filled clock 
 		for(int i = 0; i < clock.length(); i++) {
-			if(!clock.getData().isReferenced()) {
-				VirtualPageTableEntries rtn = clock.getData();
-				clock.setData(replacementEntry);
-//				if (counter++ > Driver.TLB_SIZE)
-					Driver.setEvicted(rtn.getPageFrameNum());
-				
-				Driver.mmu.getPageTable()[virtualPageNum].setPageFrameNum(rtn.getPageFrameNum());
-				return rtn;
-			} else {
+			if(!clock.getData().isReferenced())
+				break;
+			else {
 				clock.getData().setRbit(false);
 				clock.advance();
 			}
 		}
-		System.out.println("clock size: "+ clock.length());
 		if(clock.getData().isDirty()) {
 			//write to hard disk?
 			Driver.dirtyEvicted(true);
+			clock.getData().setDbit(false);
 			diskWrite(clock.getData(), virtualPageNum);
 		}
-		Driver.setEvicted(clock.getData().getPageFrameNum());
-		return clock.getData();
+		
+		int evictedPage = clock.getData().getPageFrameNum();
+		clock.remove();
+		clock.add(replacementEntry);
+		replacementEntry.setPageFrameNum(evictedPage);
+		Driver.setEvicted(evictedPage);
+		
+		return evictedPage;
 	}
-//
-//	public static void changePageTableEntry(int virtualPageNum) {
-//		Driver.mmu.getPageTable()[virtualPageNum].setPageFrameNum(pageFrameNum);
-//	}
 	
 	//Passed in a File from Driver class and begins Scanning File contents
 	public static void runProcess(File fileToRead) throws FileNotFoundException {
@@ -82,14 +73,10 @@ public class OS {
 					Driver.outputToCSV();
 				}catch(Exception e){	//Hard miss
 //					System.out.println(e.getMessage());					
-					int pageNum = 0;
-					if(pageReplacement(Driver.mmu.getPageTable()[virtualPage], virtualPage) == null) {
-						pageNum = 0;
-					} else {
-						pageNum = pageReplacement(Driver.mmu.getPageTable()[virtualPage], virtualPage).getPageFrameNum();
-					}
-					if (pageNum < 0) 
-						pageNum = 0;
+					int pageNum = pageReplacement(Driver.mmu.getPageTable()[virtualPage], virtualPage);
+					
+					if (pageNum < -1) 
+						throw new FileNotFoundException("This shit broke");
 					
 					diskLoad(pageNum, virtualPage);
 
@@ -117,7 +104,7 @@ public class OS {
     public static void diskLoad( int pageFrameNumber, int virtualPageNum) {
         try {
             
-            File file = new File(Driver.pageFileDir + "/" + Driver.zeroPad(Integer.toString(virtualPageNum, 16)) + ".pg");
+            File file = new File(Driver.pageFileDir + "/" + Driver.zeroPad(Integer.toString(virtualPageNum, 16).toUpperCase()) + ".pg");
             Scanner sc = new Scanner(file);
             
             for (int i = 0; i < Driver.mmu.getPhysicalMem()[0].length; ++i)
@@ -139,7 +126,7 @@ public class OS {
     
     public static void diskWrite(int pageFrameNumber, int virtualPageNum) {
         try {
-            File file = new File(Driver.pageFileDir + "/" + Integer.toString(virtualPageNum, 16) + ".pg");
+            File file = new File(Driver.pageFileDir + "/" + Driver.zeroPad(Integer.toString(virtualPageNum, 16).toUpperCase()) + ".pg");
             PrintWriter writer = new PrintWriter(file);
             
             for (int i = 0; i < Driver.mmu.getPhysicalMem()[0].length; ++i)

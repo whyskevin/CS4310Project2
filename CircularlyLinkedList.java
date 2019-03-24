@@ -25,13 +25,13 @@ public class CircularlyLinkedList<T> {
 	}
 	
 	public void setData(T newData) {
-		cursor.data = newData;
+		cursor.getNext().data = newData;
 	}
 	
 	/** Gets the data of the cursor
 	 * 	@return current cursor data */
 	public T getData(){
-		return cursor.data;
+		return cursor.getNext().data;
 	}
 	
 	/** Gets the number of elements of the cLL
@@ -56,6 +56,7 @@ public class CircularlyLinkedList<T> {
 				cursor.setNext(newNode);
 			}
 			size++;
+			advance();
 			return true;
 		}
 	}
