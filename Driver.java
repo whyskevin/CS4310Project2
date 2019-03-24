@@ -29,7 +29,7 @@ public class Driver {
     }
     
     public static void setWrite(boolean wt) {
-        write = Boolean.toString(wt);
+        write = wt ? "1" : "0";
     }
     
     public static void setValue(int val) {
@@ -37,15 +37,15 @@ public class Driver {
     }
     
     public static void softMiss(boolean miss) {
-        soft = Boolean.toString(miss);
+        soft = miss ? "1" : "0";
     }
     
     public static void hardMiss(boolean miss) {
-        hard = Boolean.toString(miss);
+        hard = miss ? "1" : "0";
     }
     
     public static void hit(boolean _hit) {
-        hit = Boolean.toString(_hit);
+        hit = _hit ? "1" : "0";
     }
     
     public static void setEvicted(int pgNum) {
@@ -53,7 +53,7 @@ public class Driver {
     }
     
     public static void dirtyEvicted(boolean dirty) {
-        dirtyEvictedPage = Boolean.toString(dirty);
+        dirtyEvictedPage = dirty ? "1" : "0";
     }
     
     public static void csvHeader() throws IOException {

@@ -145,6 +145,7 @@ public class MMU {
 		if(write) {	//Writing
 			setPhysicalMem(presentEntry.getPageFrameNum(),physicalOffset,data);
 			presentEntry.setDbit(true);
+			Driver.mmu.getPageTable()[virtualPageIndex].setDbit(true);
 		}else {	//Reading
 			data = physicalMem[presentEntry.getPageFrameNum()][physicalOffset];
 		}
