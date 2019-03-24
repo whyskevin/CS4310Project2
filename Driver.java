@@ -49,7 +49,7 @@ public class Driver {
     }
     
     public static void setEvicted(int pgNum) {
-        evictedPageNum = Integer.toString(pgNum);
+        evictedPageNum = pgNum < 0? "N/A" : Integer.toString(pgNum);
     }
     
     public static void dirtyEvicted(boolean dirty) {
@@ -73,8 +73,8 @@ public class Driver {
     }
     
     public static void main(String[] args) {
-//        String arg = testDataDir + "/test_1.txt";
-    	String arg = args[0];
+        String arg = testDataDir + "/test_1.txt";
+//    	String arg = args[0];
         OS.loadClock();
         
 //        System.out.println(mmu.getPhysicalMem().length);
