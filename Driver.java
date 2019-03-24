@@ -1,5 +1,7 @@
 import java.lang.Math;
 import java.util.Scanner;
+import org.apache.commons.io.FileUtils;
+
 import java.io.*;
 
 public class Driver {
@@ -19,6 +21,9 @@ public class Driver {
     
     public static String pageFileDir = "Project2_test_and_page_files/page_files";
     public static String testDataDir = "Project2_test_and_page_files/test_files";
+    public static String changedPageFiledir = "Project2_test_and_page_files/changed_page_files";
+    
+    public static File changedPageFiles;
     
     public static String address, write, value, soft, hard, hit, evictedPageNum, dirtyEvictedPage;
     
@@ -74,9 +79,9 @@ public class Driver {
     
     public static void main(String[] args) {
         String arg = testDataDir + "/test_1.txt";
-//    	String arg = args[0];
-        // OS.loadClock();        
-//        System.out.println(mmu.getPhysicalMem().length);
+//    	String arg = args[0];    
+    	//Copy page files into a new directory. Then operate loads/writes using that dir
+    	copyPageFiles(arg.substring(arg.indexOf("/test_"), arg.indexOf('.')));
         try {
 			outputFile = new PrintWriter(arg.substring(0, arg.indexOf('.')) + ".csv");
 			csvHeader();
@@ -97,4 +102,17 @@ public class Driver {
 			e.printStackTrace();
 		}
     }
+    
+    public static void copyPageFiles(String fileName) {
+    	File originalPageFiles = new File(pageFileDir);
+    	changedPageFiles = new File (changedPageFiledir + fileName);
+    	System.out.println(changedPageFiledir + fileName);
+    	try {
+			FileUtils.copyDirectory(originalPageFiles, changedPageFiles);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
 }
