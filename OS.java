@@ -6,9 +6,9 @@ import java.util.Scanner;
 
 public class OS {
 
-	private static CircularlyLinkedList<VirtualPageTableEntries> clock = new CircularlyLinkedList<VirtualPageTableEntries>();
+	private static CircularlyLinkedList<ClockEntry> clock = new CircularlyLinkedList<ClockEntry>();
 
-	public static int pageReplacement(VirtualPageTableEntries replacementEntry, int virtualPageNum) {
+	public static int pageReplacement(ClockEntry replacementEntry) {
 		//Logic before the clock is filled
 		if(clock.length() < Driver.NUM_PHYSICAL_PAGES) {
 			int pageNum = clock.length();
@@ -26,21 +26,23 @@ public class OS {
 				clock.advance();
 			}
 		}
+		int pgFrNum = clock.getData().getPageFrameNum();
+		int evictedPage = clock.getData().getVirtualPageNum();
+		
 		if(clock.getData().isDirty()) {
 			//write to hard disk?
 			Driver.dirtyEvicted(true);
 			clock.getData().setDbit(false);
-			diskWrite(clock.getData(), Driver.mmu.getVirtualPageForDiskWrite(clock.getData().getPageFrameNum()));
+			diskWrite(pgFrNum, evictedPage);
 		}
 		
-		int evictedPage = clock.getData().getPageFrameNum();
 		clock.getData().setVbit(false);
 		clock.remove();
 		clock.add(replacementEntry);
-		replacementEntry.setPageFrameNum(evictedPage);
+		replacementEntry.setPageFrameNum(pgFrNum);
 		Driver.setEvicted(evictedPage);
 		
-		return evictedPage;
+		return pgFrNum;
 	}
 	
 	//Passed in a File from Driver class and begins Scanning File contents
@@ -76,8 +78,10 @@ public class OS {
 					Driver.cpu.readInstruction(virtualPage, pageOffset, write, data);
 					Driver.outputToCSV();
 				}catch(Exception e){	//Hard miss
-//					System.out.println(e.getMessage());					
-					int pageNum = pageReplacement(Driver.mmu.getPageTable()[virtualPage], virtualPage);
+//					System.out.println(e.getMessage());	
+					ClockEntry replacementEntry = new ClockEntry(Driver.mmu.getPageTable()[virtualPage], virtualPage);
+					
+					int pageNum = pageReplacement(replacementEntry);
 					
 					diskLoad(pageNum, virtualPage);
 

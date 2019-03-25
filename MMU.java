@@ -42,14 +42,6 @@ public class MMU {
 		}
 		return -1;
 	}
-	
-	public int getVirtualPageForDiskWrite(int pageFrameNum) {
-		for (int i = 0; i < pageTable.length; ++i) {
-			if (pageTable[i].getPageFrameNum() == pageFrameNum && pageTable[i].isValid())
-				return i;
-		}
-		return -1;
-	}
 
 	//Checks if virtual page index is loaded in physical memory
 	//if true, return page frame number
@@ -146,24 +138,4 @@ public class MMU {
 		}
 		Driver.setValue(data);
 	}
-
-
-	/*	processInstruction()
-	 * 1.Checks if it's present in the TLB
-	 * 2.If it is present
-	 * 		Read: R bit to true
-	 * 		Write: Access (Pg frame number, offset)	in the RAM. Overwrite the value there to the given data
-	 * 3.Else if it isn't present check virtualPageTable
-	 * 		Soft Miss: if its present in virtualPageTable
-	 * 			Retrieves the entry from the pageTable.
-	 * 			Add to the TLB and change V and R bit to true
-	 * 				Read: does nothing
-	 * 				Write: Access (Pg frame number, offset)	in the RAM. Overwrite the value there to the given data
-	 * 		Hard Miss:	//Goes to OS to find replacement entry
-	 *			Use the clock replacement algorithm to decide which entry in Pg. table to evict
-	 *			Loads .pg file from /.page_files directory using the virtualPageIndex.
-	 *			Replaces the entry in the pageTable with the new entry at the evicted entry's location.
-	 * 			Page frame num is kept
-	 * */
-
 }
