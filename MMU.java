@@ -43,6 +43,14 @@ public class MMU {
 		}
 		return -1;
 	}
+	
+	public int getVirtualPageForDiskWrite(int pageFrameNum) {
+		for (int i = 0; i < pageTable.length; ++i) {
+			if (pageTable[i].getPageFrameNum() == pageFrameNum && pageTable[i].isValid())
+				return i;
+		}
+		return -1;
+	}
 
 	//Probably a better name for this function
 	//Checks if virtual page index is loaded in physical memory
