@@ -104,7 +104,7 @@ public class OS {
     public static void diskLoad( int pageFrameNumber, int virtualPageNum) {
         try {
             
-            File file = new File(Driver.pageFileDir + "/" + Driver.zeroPad(Integer.toString(virtualPageNum, 16).toUpperCase()) + ".pg");
+            File file = new File(Driver.changedPageFileDir + "/" + Driver.zeroPad(Integer.toString(virtualPageNum, 16).toUpperCase()) + ".pg");
             Scanner sc = new Scanner(file);
             
             for (int i = 0; i < Driver.mmu.getPhysicalMem()[0].length; ++i)
@@ -126,7 +126,7 @@ public class OS {
     
     public static void diskWrite(int pageFrameNumber, int virtualPageNum) {
         try {
-            File file = new File(Driver.pageFileDir + "/" + Driver.zeroPad(Integer.toString(virtualPageNum, 16).toUpperCase()) + ".pg");
+            File file = new File(Driver.changedPageFileDir + "/" + Driver.zeroPad(Integer.toString(virtualPageNum, 16).toUpperCase()) + ".pg");
             PrintWriter writer = new PrintWriter(file);
             
             for (int i = 0; i < Driver.mmu.getPhysicalMem()[0].length; ++i)

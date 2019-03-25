@@ -21,7 +21,7 @@ public class Driver {
     
     public static String pageFileDir = "Project2_test_and_page_files/page_files";
     public static String testDataDir = "Project2_test_and_page_files/test_files";
-    public static String changedPageFiledir = "Project2_test_and_page_files/changed_page_files";
+    public static String changedPageFileDir = "Project2_test_and_page_files/changed_page_files";
     
     public static File changedPageFiles;
     
@@ -78,10 +78,10 @@ public class Driver {
     }
     
     public static void main(String[] args) {
-        String arg = testDataDir + "/test_1.txt";
-//    	String arg = args[0];    
-    	//Copy page files into a new directory. Then operate loads/writes using that dir
-    	copyPageFiles(arg.substring(arg.indexOf("/test_"), arg.indexOf('.')));
+//        String arg = testDataDir + "/test_2.txt";
+    	String arg = args[0];    
+    	//Copy page files into a new directory. Then operate loads/writes using that dir. 
+    	copyPageFiles(arg.substring(arg.indexOf("/test_"), arg.indexOf('.')));	//This line must be included.
         try {
 			outputFile = new PrintWriter(arg.substring(0, arg.indexOf('.')) + ".csv");
 			csvHeader();
@@ -105,8 +105,9 @@ public class Driver {
     
     public static void copyPageFiles(String fileName) {
     	File originalPageFiles = new File(pageFileDir);
-    	changedPageFiles = new File (changedPageFiledir + fileName);
-    	System.out.println(changedPageFiledir + fileName);
+    	changedPageFileDir += fileName;	//New changedPageFileDir name
+    	changedPageFiles = new File (changedPageFileDir);
+//    	System.out.println(changedPageFileDir);
     	try {
 			FileUtils.copyDirectory(originalPageFiles, changedPageFiles);
 		} catch (IOException e) {
