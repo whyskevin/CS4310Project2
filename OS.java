@@ -34,6 +34,7 @@ public class OS {
 		}
 		
 		int evictedPage = clock.getData().getPageFrameNum();
+		clock.getData().setVbit(false);
 		clock.remove();
 		clock.add(replacementEntry);
 		replacementEntry.setPageFrameNum(evictedPage);
@@ -74,9 +75,6 @@ public class OS {
 				}catch(Exception e){	//Hard miss
 //					System.out.println(e.getMessage());					
 					int pageNum = pageReplacement(Driver.mmu.getPageTable()[virtualPage], virtualPage);
-					
-					if (pageNum < -1) 
-						throw new FileNotFoundException("This shit broke");
 					
 					diskLoad(pageNum, virtualPage);
 
