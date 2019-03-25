@@ -22,7 +22,7 @@ public class Driver {
     
     
     public static String pageFileDir = "Project2_test_and_page_files/page_files";
-    public static String testDataDir = "Project2_test_and_page_files/test_files";
+    // public static String testDataDir = "Project2_test_and_page_files/test_files";
     public static String changedPageFileDir = "Project2_test_and_page_files/changed_page_files";
     
     public static File changedPageFiles;
@@ -58,7 +58,7 @@ public class Driver {
     }
     
     public static void setEvicted(int pgNum) {
-        evictedPageNum = pgNum < 0? "N/A" : Integer.toString(pgNum);
+        evictedPageNum = pgNum < 0? "N/A" : zeroPad(Integer.toString(pgNum, 16)).toUpperCase();
     }
     
     public static void dirtyEvicted(boolean dirty) {
@@ -82,7 +82,6 @@ public class Driver {
     }
     
     public static void main(String[] args) {
-//        String arg = testDataDir + "/test_1.txt";
     	String arg = args[0];
         try {
         	File originalPageFiles = new File(pageFileDir);
@@ -107,42 +106,23 @@ public class Driver {
 		}
     }
     
-    /**
-     * This function recursively copy all the sub folder and files from sourceFolder to destinationFolder
-     * */
+    //This function copies all the files from sourceFolder to destinationFolder
     private static void copyFolder(File sourceFolder, File destinationFolder) throws IOException
     {
-        //Check if sourceFolder is a directory or file
-        //If sourceFolder is file; then copy the file directly to new location
-        if (sourceFolder.isDirectory())
+        //Verify if destinationFolder is already present; If not then create it
+        if (!destinationFolder.exists())
+            destinationFolder.mkdir();
+         
+        //Get all files from source directory
+        String files[] = sourceFolder.list();
+         
+        //Iterate over all files and copy them to destinationFolder one by one
+        for (String file : files)
         {
-            //Verify if destinationFolder is already present; If not then create it
-            if (!destinationFolder.exists())
-            {
-                if(destinationFolder.mkdir())
-                	System.out.println("Directory created: " + destinationFolder);
-                else
-                	System.out.println("Directory not created!");
-            }
-             
-            //Get all files from source directory
-            String files[] = sourceFolder.list();
-             
-            //Iterate over all files and copy them to destinationFolder one by one
-            for (String file : files)
-            {
-                File srcFile = new File(sourceFolder, file);
-                File destFile = new File(destinationFolder, file);
-                 
-                //Recursive function call
-                copyFolder(srcFile, destFile);
-            }
-        }
-        else
-        {
-            //Copy the file content from one place to another
-            Files.copy(sourceFolder.toPath(), destinationFolder.toPath(), StandardCopyOption.REPLACE_EXISTING);
-//            System.out.println("File copied :: " + destinationFolder);
+            File srcFile = new File(sourceFolder, file);
+            File destFile = new File(destinationFolder, file);
+            
+            Files.copy(srcFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         }
     }
 
