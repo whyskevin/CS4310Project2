@@ -25,7 +25,6 @@ public class Driver {
     public static String testDataDir = "Project2_test_and_page_files/test_files";
     public static String changedPageFileDir = "Project2_test_and_page_files/changed_page_files";
     
-    public static File testData = new File(testDataDir);
     public static File changedPageFiles;
     
     public static String address, write, value, soft, hard, hit, evictedPageNum, dirtyEvictedPage;
@@ -143,7 +142,7 @@ public class Driver {
         {
             //Copy the file content from one place to another
             Files.copy(sourceFolder.toPath(), destinationFolder.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            System.out.println("File copied :: " + destinationFolder);
+//            System.out.println("File copied :: " + destinationFolder);
         }
     }
 
