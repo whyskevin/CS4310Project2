@@ -30,7 +30,7 @@ public class OS {
 			//write to hard disk?
 			Driver.dirtyEvicted(true);
 			clock.getData().setDbit(false);
-			diskWrite(clock.getData(), virtualPageNum);
+			diskWrite(clock.getData(), Driver.mmu.getVirtualPageForDiskWrite(clock.getData().getPageFrameNum()));
 		}
 		
 		int evictedPage = clock.getData().getPageFrameNum();
@@ -59,6 +59,9 @@ public class OS {
 				String virtualAddress = in.next();
 				int virtualPage = Integer.valueOf(virtualAddress.substring(0,2), 16);
 				int pageOffset = Integer.valueOf(virtualAddress.substring(2,4), 16);
+				
+				// System.out.println(virtualAddress + " " + virtualPage + " " + pageOffset);
+				
 				boolean write = instruction == 1;
 
 				Driver.setAddress(virtualAddress);
@@ -122,6 +125,7 @@ public class OS {
     	diskWrite(entry.getPageFrameNum(), virtualPageNum);
     }
     
+    	static int count = 0;
     public static void diskWrite(int pageFrameNumber, int virtualPageNum) {
         try {
             File file = new File(Driver.changedPageFileDir + "/" + Driver.zeroPad(Integer.toString(virtualPageNum, 16).toUpperCase()) + ".pg");
