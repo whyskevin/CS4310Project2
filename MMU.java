@@ -1,34 +1,33 @@
 import java.util.*;
 public class MMU {
-	
+
 	private TlbEntries[] TLB;
 	private VirtualPageTableEntries[] pageTable;
 	private int[][] physicalMem;
 	private int TLBPageReplacementCounter = 0;	//is "pageToReplaceInTLB" a counter? It keeps a reference to which page to be replaced.
-	
+
 	public MMU(int tlbSize, int numVirtualPages, int numPhysicalPages, int pageSize) {
 		TLB = new TlbEntries[tlbSize];
 		for (int i = 0; i < tlbSize; ++i)
 			TLB[i] = new TlbEntries();
-		
+
 		pageTable = new VirtualPageTableEntries[numVirtualPages];
 		for (int i = 0; i < numVirtualPages; ++i)
 			pageTable[i] = new VirtualPageTableEntries();
-		
+
 		physicalMem = new int[numPhysicalPages][pageSize];
 	}
 
-	public MMU(TlbEntries[] TLB, VirtualPageTableEntries[] pageTable, 
-			int[][] physicalMem) {
+	public MMU(TlbEntries[] TLB, VirtualPageTableEntries[] pageTable, int[][] physicalMem) {
 		this.TLB = TLB;
 		this.pageTable = pageTable;
 		this.physicalMem = physicalMem;
 	}
-	
+
 	public TlbEntries[] getTLB() {
 		return TLB;
 	}
-	
+
 	public VirtualPageTableEntries[] getPageTable() {
 		return pageTable;
 	}
@@ -44,7 +43,6 @@ public class MMU {
 		return -1;
 	}
 
-	//Probably a better name for this function
 	//Checks if virtual page index is loaded in physical memory
 	//if true, return page frame number
 	//if false, throw error for hard miss
@@ -55,7 +53,7 @@ public class MMU {
 			//TODO: throw error and OS loads page into physical memory
 			return -1;
 	}
-	
+
 	public int[][] getPhysicalMem() {
 		return physicalMem;
 	}
@@ -63,11 +61,11 @@ public class MMU {
 	public int getPhysicalMem(int pageFrame, int pageOffset) {
 		return physicalMem[pageFrame][pageOffset];
 	}
-	
+
 	public int getTLBPageReplacementCounter() {
 		return TLBPageReplacementCounter;
 	}
-	
+
 	//idk if we need any setters yet, we can add them later if we need them
 	public void setPhysicalMem(int pageFrame, int pageOffset, int data) {
 		physicalMem[pageFrame][pageOffset] = data;
@@ -87,7 +85,7 @@ public class MMU {
 
 		if (TLBIndex != -1)
 			TLB[TLBIndex].setDbit(false);
-		
+
 		pageTable[virtualPageIndex].setDbit(false);
 	}
 
@@ -96,15 +94,15 @@ public class MMU {
 		TLB[TLBPageReplacementCounter] = entry;
 		TLBPageReplacementCounter = (TLBPageReplacementCounter + 1) % TLB.length;
 	}
-	
+
 	public void processInstruction(int virtualPageIndex, int physicalOffset , boolean write, int data) {
 		int TLB_Flag = checkTLB(virtualPageIndex);
 		TlbEntries presentEntry;
-	
+
 		Driver.softMiss(false);
 		Driver.hardMiss(false);
 		Driver.hit(false);
-	
+
 		if(TLB_Flag >= 0) {	//The entry exists in the TLB
 			presentEntry = TLB[TLB_Flag];
 			Driver.hit(true);
@@ -159,5 +157,5 @@ public class MMU {
 	 *			Replaces the entry in the pageTable with the new entry at the evicted entry's location.
 	 * 			Page frame num is kept
 	 * */
-	
+
 }

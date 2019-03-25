@@ -1,6 +1,8 @@
 import java.lang.Math;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Scanner;
-import org.apache.commons.io.FileUtils;
+//import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 
@@ -23,11 +25,14 @@ public class Driver {
     public static String testDataDir = "Project2_test_and_page_files/test_files";
     public static String changedPageFileDir = "Project2_test_and_page_files/changed_page_files";
     
+    public static File testData = new File(testDataDir);
     public static File changedPageFiles;
     
     public static String address, write, value, soft, hard, hit, evictedPageNum, dirtyEvictedPage;
     
     public static PrintWriter outputFile;
+    
+    public Driver() {}
     
     public static void setAddress(String addr) {
         address = addr;
@@ -78,19 +83,19 @@ public class Driver {
     }
     
     public static void main(String[] args) {
-//        String arg = testDataDir + "/test_2.txt";
-    	String arg = args[0];    
-    	//Copy page files into a new directory. Then operate loads/writes using that dir. 
-    	copyPageFiles(arg.substring(arg.indexOf("/test_"), arg.indexOf('.')));	//This line must be included.
+//        String arg = testDataDir + "/test_1.txt";
+    	String arg = args[0];
         try {
-			outputFile = new PrintWriter(arg.substring(0, arg.indexOf('.')) + ".csv");
+        	File originalPageFiles = new File(pageFileDir);
+        	changedPageFiles = new File (changedPageFileDir);
+			copyFolder(originalPageFiles, changedPageFiles);	//Copy page files into a new directory. Then operate loads/writes using that directory
+			Driver.outputFile = new PrintWriter(arg.substring(0, arg.indexOf('.')) + ".csv");
 			csvHeader();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     	readDirectories(arg);
-    	outputFile.close();
+    	Driver.outputFile.close();
     }
     
     public static void readDirectories(String fname) {
@@ -103,17 +108,43 @@ public class Driver {
 		}
     }
     
-    public static void copyPageFiles(String fileName) {
-    	File originalPageFiles = new File(pageFileDir);
-    	changedPageFileDir += fileName;	//New changedPageFileDir name
-    	changedPageFiles = new File (changedPageFileDir);
-//    	System.out.println(changedPageFileDir);
-    	try {
-			FileUtils.copyDirectory(originalPageFiles, changedPageFiles);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    /**
+     * This function recursively copy all the sub folder and files from sourceFolder to destinationFolder
+     * */
+    private static void copyFolder(File sourceFolder, File destinationFolder) throws IOException
+    {
+        //Check if sourceFolder is a directory or file
+        //If sourceFolder is file; then copy the file directly to new location
+        if (sourceFolder.isDirectory())
+        {
+            //Verify if destinationFolder is already present; If not then create it
+            if (!destinationFolder.exists())
+            {
+                if(destinationFolder.mkdir())
+                	System.out.println("Directory created: " + destinationFolder);
+                else
+                	System.out.println("Directory not created!");
+            }
+             
+            //Get all files from source directory
+            String files[] = sourceFolder.list();
+             
+            //Iterate over all files and copy them to destinationFolder one by one
+            for (String file : files)
+            {
+                File srcFile = new File(sourceFolder, file);
+                File destFile = new File(destinationFolder, file);
+                 
+                //Recursive function call
+                copyFolder(srcFile, destFile);
+            }
+        }
+        else
+        {
+            //Copy the file content from one place to another
+            Files.copy(sourceFolder.toPath(), destinationFolder.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("File copied :: " + destinationFolder);
+        }
     }
-    
+
 }

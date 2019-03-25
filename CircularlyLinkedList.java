@@ -17,29 +17,29 @@
 public class CircularlyLinkedList<T> {
 	protected Node<T> cursor;
 	public int size;
-	
+
 	/** Initialization of default constructor */
 	public CircularlyLinkedList(){
 		cursor = null;
 		size = 0;
 	}
-	
+
 	public void setData(T newData) {
 		cursor.getNext().data = newData;
 	}
-	
+
 	/** Gets the data of the cursor
 	 * 	@return current cursor data */
 	public T getData(){
 		return cursor.getNext().data;
 	}
-	
+
 	/** Gets the number of elements of the cLL
 	 * 	@return size  Number of elements */
 	public int length(){
-	    return size;
+		return size;
 	}
-	
+
 	/** Creates a new node with data and sets it right after the cursor, increases size of list.
 	 *  @param data  The data to add
 	 * 	@return true or false  Depending on whether the addition is successful or not */
@@ -60,7 +60,7 @@ public class CircularlyLinkedList<T> {
 			return true;
 		}
 	}
-	
+
 	/** Sets cursor to node after current cursor.
 	 * 	@return true or false  Depending on whether the advancement is successful or not */
 	public boolean advance(){
@@ -71,7 +71,7 @@ public class CircularlyLinkedList<T> {
 			return true;
 		}
 	}
-	
+
 	/** Removes the node immediately after the cursor and decreases size of list.
 	 * 	@return true or false  Depending on whether the subtraction is successful or not */
 	public boolean remove() {
@@ -88,7 +88,7 @@ public class CircularlyLinkedList<T> {
 		size--;
 		return true;
 	}
-	
+
 	/** Prints list while traversing through it. Stops printing when current node equals cursor again */
 	public void print(){
 		Node<T> current = cursor;
@@ -101,4 +101,4 @@ public class CircularlyLinkedList<T> {
 		}
 	}
 }
-	
+
