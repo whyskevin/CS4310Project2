@@ -82,8 +82,8 @@ public class Driver {
     }
     
     public static void main(String[] args) {
-//        String arg = testDataDir + "/test_1.txt";
-    	String arg = args[0];
+        String arg = testDataDir + "/test_1.txt";
+//    	String arg = args[0];
         try {
         	File originalPageFiles = new File(pageFileDir);
         	changedPageFiles = new File (changedPageFileDir);
